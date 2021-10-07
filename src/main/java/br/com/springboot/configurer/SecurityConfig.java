@@ -1,5 +1,7 @@
 package br.com.springboot.configurer;
 
+import br.com.springboot.service.SystemUserDetailsService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
@@ -12,7 +14,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @Log4j2
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
+@RequiredArgsConstructor
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
+
+    private final SystemUserDetailsService userDetailsService;
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -20,6 +25,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 //              .csrf().csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
 //              .and()
                 .authorizeRequests()
+                .antMatchers("/books/admin/**").hasRole("ADMIN")
                 .anyRequest()
                 .authenticated()
                 .and()
@@ -31,15 +37,23 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         PasswordEncoder passwordEncoder = PasswordEncoderFactories.createDelegatingPasswordEncoder();
-        log.info("Password encoded {}", passwordEncoder.encode("test"));
+        log.info("Password encoded {}", passwordEncoder.encode("admin"));
+
+        // Aqui possuímos duas configurações de autenticação
+        // O Spring sempre tentará primeiro autenticar em memória, caso não consiga, ele autentica no banco
+
+        // Autenticação em memória
         auth.inMemoryAuthentication()
-                .withUser("janaina")
+                .withUser("janainamai")
                 .password(passwordEncoder.encode("admin"))
                 .roles("USER", "ADMIN")
                 .and()
-                .withUser("heloisa")
+                .withUser("heloisatheiss")
                 .password(passwordEncoder.encode("admin"))
                 .roles("USER");
+
+        // Autenticação no database
+        auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder);
     }
 
 }

@@ -23,58 +23,59 @@ import java.util.List;
 @AllArgsConstructor
 @Log4j2
 public class BookController {
-	 
-	private BookService bookService;
 
-	@GetMapping( path = "/listPageable")
-	public ResponseEntity<Page<Book>> listPageable(Pageable pageable) {
-		return ResponseEntity.ok(bookService.listPageable(pageable));
-	}
+    private BookService bookService;
 
-	@GetMapping()
-	public ResponseEntity<List<Book>> list() {
-		return ResponseEntity.ok(bookService.listAll());
-	}
-	
-	@GetMapping(path = "/find/{name}")
-	public ResponseEntity<List<Book>> findByName(@PathVariable String name) {
-		return ResponseEntity.ok(bookService.findByName(name));
-	}
-	
-	@GetMapping(path = "/find")
-	public ResponseEntity<List<Book>> findByAutor(@RequestParam String autor) {
-		return ResponseEntity.ok(bookService.findByAutor(autor));
-	}
-	
-	@GetMapping(path = "/{id}")
-	public ResponseEntity<Book> findById(@PathVariable Long id) {
-		return ResponseEntity.ok(bookService.findByIdOrThrowBadRequest(id));
-	}
+    @GetMapping(path = "/listPageable")
+    public ResponseEntity<Page<Book>> listPageable(Pageable pageable) {
+        return ResponseEntity.ok(bookService.listPageable(pageable));
+    }
 
-	@GetMapping(path = "by-id/{id}")
-	public ResponseEntity<Book> findByIdAuthenticationPrincipal(@PathVariable Long id,
-																@AuthenticationPrincipal UserDetails userDetails) {
-		log.info(userDetails);
-		return ResponseEntity.ok(bookService.findByIdOrThrowBadRequest(id));
-	}
-	
-	@PostMapping
-	@PreAuthorize("hasRole('ADMIN')")
-	public ResponseEntity<Book> save(@RequestBody @Valid BookPost book) {
-		return new ResponseEntity<>(bookService.save(book), HttpStatus.CREATED);
-	}
-	
-	@DeleteMapping(path = "/{id}")
-	@PreAuthorize("hasRole('ADMIN')")
-	public ResponseEntity<Void> delete(@PathVariable Long id) {
-		bookService.delete(id);
-		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-	}
-	
-	@PutMapping
-	@PreAuthorize("hasRole('ADMIN')")
-	public ResponseEntity<Void> replace(@RequestBody BookPut book) {
-		bookService.replace(book);
-		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-	}
+    @GetMapping()
+    public ResponseEntity<List<Book>> list() {
+        return ResponseEntity.ok(bookService.listAll());
+    }
+
+    @GetMapping(path = "/find/{name}")
+    public ResponseEntity<List<Book>> findByName(@PathVariable String name) {
+        return ResponseEntity.ok(bookService.findByName(name));
+    }
+
+    @GetMapping(path = "/find")
+    public ResponseEntity<List<Book>> findByAutor(@RequestParam String autor) {
+        return ResponseEntity.ok(bookService.findByAutor(autor));
+    }
+
+    @GetMapping(path = "/{id}")
+    public ResponseEntity<Book> findById(@PathVariable Long id) {
+        return ResponseEntity.ok(bookService.findByIdOrThrowBadRequest(id));
+    }
+
+    @GetMapping(path = "by-id/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Book> findByIdAuthenticationPrincipal(@PathVariable Long id,
+                                                                @AuthenticationPrincipal UserDetails userDetails) {
+        log.info(userDetails);
+        return ResponseEntity.ok(bookService.findByIdOrThrowBadRequest(id));
+    }
+
+    @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Book> save(@RequestBody @Valid BookPost book) {
+        return new ResponseEntity<>(bookService.save(book), HttpStatus.CREATED);
+    }
+
+    @DeleteMapping(path = "/admin/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
+        bookService.delete(id);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @PutMapping
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Void> replace(@RequestBody BookPut book) {
+        bookService.replace(book);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
 }
