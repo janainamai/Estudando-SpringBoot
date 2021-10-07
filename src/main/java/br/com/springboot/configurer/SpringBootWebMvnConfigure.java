@@ -1,4 +1,4 @@
-package br.com.springboot.configure;
+package br.com.springboot.configurer;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.domain.PageRequest;
